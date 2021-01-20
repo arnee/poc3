@@ -1,0 +1,95 @@
+<h1>Weather Machine with ACL</h1>
+<p>
+    Imagine you are building a component you want to share. You can now
+    tag various parts in the template with an acl resource name through the directive
+    "*aclTag"
+    acl works, you can unlock some moody emojis with your policy.
+</p>
+
+<!-- Part 1 (Template Usage & manual ACL)-->
+
+<div *aclTag="'weather'">
+    <!--
+    Notice the nested usage of the aclTag here 👈 📚
+    This will create ACL resource bindings in that hierarchy.
+    "weather" is the parent of the folliwing list of aclTags
+    so "sun", "rain" & co. are actually resources with the name
+    "weather/sun", "weather/rain". This is fundamental to understand with ACL
+    as we rely on the hierarchical ACL keys.
+
+    Also note that the directive is a structural directive (see the star (*) prefix).
+    This means the directive removes the content and only renders it
+    when the directive code wants to do that. In this case the directive
+    queries for the full ACL resource e.g. weather/sun if it can be viewed.
+    If yes, add, otherwise remove.
+
+    Tip 🌟:
+    Open the ACL Debugger Settings to render ACL icons that show the full ACL keys
+    for everything you have tagged in the template.
+
+    -->
+    <span *aclTag="'sun'">{{sun}}</span>
+    <span *aclTag="'rain'">{{rain}}</span>
+    <span *aclTag="'storm'">{{storm}}</span>
+    <span *aclTag="'snow'">{{snow}}</span>
+    <hr>
+    <div>
+        Oh that's a wild weather! Would be awesome to control it, wouldn't it?
+        Check the ACL Debugger if you can find the rules to reveal some magic buttons.
+    </div>
+    <div *aclTag="'machine'">
+        <div *aclTag="'sun'">
+            <button (click)="makeSun()">make sun everywhere</button>
+            <div>I wonder how to go back to normal weather now? Check the ACL Debugger for a resource that could help here.</div>
+        </div>
+
+        <div *aclTag="'normal'">
+            <button [disabled]="isWeatherResetDisabled$ | async" (click)="reset()">back to normal</button>
+            <br>
+            <span> Yes, there is the machine button. You might need to find the rule that disables it first and deactivate it.</span>
+        </div>
+    </div>
+</div>
+
+<!--
+Part 2 (Form Utility)
+This works in combination with the `autoFormBindingFactory`
+which will auto-generate bindings between ACL and FormControls
+to disable/enable them (edit) or to remove them from a Form Group (view)
+to remove the data from the result form data.
+-->
+<form [formGroup]="myMonsterForm">
+    <div formGroupName="monsterMachine" *aclTag="'monster-machine'">
+        <p>
+            Oh there is a monster machine hidden 🧚‍ <br>
+            Everything is disabled so maybe you can unlock the fields?
+        </p>
+
+        <select *aclTag="'monster-type'" formControlName="monsterType">
+            <option value="kirby">Kirby</option>
+            <option value="godzilla">Godzilla</option>
+            <option value="cat">Cat</option>
+        </select>
+        <input  *aclTag="'monster-name'" formControlName="monsterName" type="text" placeholder="Give it a cute name">
+
+        <pre>{{myMonsterForm.value | json}}</pre>
+        <div *ngIf="monsterType">
+            <container-element [ngSwitch]="monsterType">
+              <span *ngSwitchCase="'kirby'">
+                  <img alt="Angry Kirby walking towards you" src="assets/giphy-kirby.gif">
+              </span>
+              <span *ngSwitchCase="'godzilla'" class="emopji" >🦖</span>
+              <span *ngSwitchCase="'cat'" class="emoji">😼</span>
+              <span *ngSwitchDefault>🐕 (I'm not a monster, just a placeholder)</span>
+            </container-element>
+
+            <span>My name is {{monsterName}}. Rooaar...</span>
+            <p>
+                That's all about ACL. Thanks for goign through the examples.
+                Don't forget to check out the ACL Guide at <a href="https://api-test.allianz.com/itmp-bb-library/my-viewer/guides">Guides</a>
+            </p>
+        </div>
+    </div>
+</form>
+
+<acl-debugger [show]="true"></acl-debugger>

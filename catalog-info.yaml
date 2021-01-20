@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: "Test"
+  description: "Test"
+  annotations:
+    github.com/project-slug: "arnee/poc3"
+    backstage.io/techdocs-ref: github:https://github.com/arnee/poc3
+spec:
+  type: website
+  lifecycle: experimental
+  owner: "arnee"
